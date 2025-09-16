@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -24,7 +25,7 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
     TextView liczbaProb, najlepszyWynik;
-    SharedPreferences najlepszyWynikTekst;
+    Button sprawdz, reset;
     LinearLayout tlo;
     EditText wpisanaLiczbaTekst;
     public int liczbaProbLiczba;
@@ -43,58 +44,64 @@ public class MainActivity extends AppCompatActivity {
         Random random = new Random();
         wylosowanaLiczba = random.nextInt(100) + 1;
         liczbaProbLiczba = 0;
-    }
-
-    public void Sprawdz(View view){
-
-        if (liczbaProbLiczba == 10) {
-            Toast.makeText(this, "Wylosowana liczba to: " + wylosowanaLiczba, Toast.LENGTH_LONG).show();
-            Reset(view);
-        }else if(liczbaProbLiczba < 10) {
-            wpisanaLiczbaString = wpisanaLiczbaTekst.getText().toString();
-            wpisanaLiczba = parseInt(wpisanaLiczbaString);
-            if (wpisanaLiczba != NULL) {
-                if (wpisanaLiczba < wylosowanaLiczba) {
-                    if(wpisanaLiczba + 10 < wylosowanaLiczba){
-                        tlo.setBackgroundColor(Color.RED);
-                    }else if(wpisanaLiczba + 10 > wylosowanaLiczba){
-                        tlo.setBackgroundColor(Color.YELLOW);
+        sprawdz = findViewById(R.id.sprawdz);
+        reset = findViewById(R.id.reset);
+        sprawdz.setOnClickListener(v -> {
+            if (liczbaProbLiczba == 10) {
+                Toast.makeText(this, "Wylosowana liczba to: " + wylosowanaLiczba, Toast.LENGTH_LONG).show();
+                Reset();
+            }else if(liczbaProbLiczba < 10) {
+                if (wpisanaLiczbaTekst.getText().toString() != "") {
+                    wpisanaLiczbaString = wpisanaLiczbaTekst.getText().toString();
+                    wpisanaLiczba = parseInt(wpisanaLiczbaString);
+                    if (wpisanaLiczba < wylosowanaLiczba) {
+                        if (wpisanaLiczba + 10 < wylosowanaLiczba) {
+                            tlo.setBackgroundColor(Color.RED);
+                        } else if (wpisanaLiczba + 10 > wylosowanaLiczba) {
+                            tlo.setBackgroundColor(Color.YELLOW);
+                        }
+                        komunikat = "Wpisana liczba jest mniejsza niż wylosowana liczba";
+                        liczbaProbLiczba += 1;
+                        liczbaProb.setText("Liczba prob: " + liczbaProbLiczba);
+                        wpisanaLiczbaTekst.setText("");
+                    } else if (wpisanaLiczba > wylosowanaLiczba) {
+                        if (wpisanaLiczba - 10 > wylosowanaLiczba) {
+                            tlo.setBackgroundColor(Color.RED);
+                        } else if (wpisanaLiczba - 10 < wylosowanaLiczba) {
+                            tlo.setBackgroundColor(Color.YELLOW);
+                        }
+                        komunikat = "Wpisana liczba jest wieksza niż wylosowana liczba";
+                        liczbaProbLiczba += 1;
+                        wpisanaLiczbaTekst.setText("");
+                        liczbaProb.setText("Liczba prob: " + liczbaProbLiczba);
+                    } else {
+                        tlo.setBackgroundColor(Color.GREEN);
+                        komunikat = "Wpisana liczba jest równa wylosowanej liczbie";
+                        liczbaProbLiczba += 1;
+                        liczbaProb.setText("Liczba prob: " + liczbaProbLiczba);
+                        if (liczbaProbLiczba == 1) {
+                            najlepszyWynik.setText("Najlepszy wynik: " + liczbaProbLiczba + " proba");
+                        } else if (liczbaProbLiczba > 4) {
+                            najlepszyWynik.setText("Najlepszy wynik: " + liczbaProbLiczba + " prob");
+                        } else {
+                            najlepszyWynik.setText("Najlepszy wynik: " + liczbaProbLiczba + " proby");
+                        }
+                        liczbaProbLiczba = 10;
                     }
-                    komunikat = "Wpisana liczba jest mniejsza niż wylosowana liczba";
-                    liczbaProbLiczba += 1;
-                    liczbaProb.setText("Liczba prob: " + liczbaProbLiczba);
-                    wpisanaLiczbaTekst.setText("");
-                } else if (wpisanaLiczba > wylosowanaLiczba) {
-                    if(wpisanaLiczba - 10 > wylosowanaLiczba){
-                        tlo.setBackgroundColor(Color.RED);
-                    }else if(wpisanaLiczba - 10 < wylosowanaLiczba){
-                        tlo.setBackgroundColor(Color.YELLOW);
-                    }
-                    komunikat = "Wpisana liczba jest wieksza niż wylosowana liczba";
-                    liczbaProbLiczba += 1;
-                    wpisanaLiczbaTekst.setText("");
-                    liczbaProb.setText("Liczba prob: " + liczbaProbLiczba);
-                } else {
-                    tlo.setBackgroundColor(Color.GREEN);
-                    komunikat = "Wpisana liczba jest równa wylosowanej liczbie";
-                    liczbaProbLiczba += 1;
-                    liczbaProb.setText("Liczba prob: " + liczbaProbLiczba);
-                    if(liczbaProbLiczba == 1) {
-                        najlepszyWynik.setText("Najlepszy wynik: " + liczbaProbLiczba + " proba");
-                    }else if(liczbaProbLiczba > 4){
-                        najlepszyWynik.setText("Najlepszy wynik: " + liczbaProbLiczba + " prob");
-                    }else{
-                        najlepszyWynik.setText("Najlepszy wynik: " + liczbaProbLiczba + " proby");
-                    }
-                    liczbaProbLiczba = 10;
+                    Toast.makeText(this, komunikat, Toast.LENGTH_LONG).show();
                 }
-                Toast.makeText(this, komunikat, Toast.LENGTH_LONG).show();
+
             }
-
-        }
-
+        });
+        reset.setOnClickListener(v -> {
+            liczbaProb.setText("Liczba prob: 0");
+            wpisanaLiczbaTekst.setText("");
+            wylosowanaLiczba = random.nextInt(100) + 1;
+            liczbaProbLiczba = 0;
+            tlo.setBackgroundColor(Color.WHITE);
+        });
     }
-    public void Reset(View view){
+    public void Reset(){
         liczbaProb.setText("Liczba prob: 0");
         wpisanaLiczbaTekst.setText("");
         Random random = new Random();
